@@ -93,20 +93,34 @@ endfunction
 function! ctrlpsmarttabs#accept(mode, str)
   let l:buffers = filter(range(1,bufnr('$')), 'buflisted(v:val)')
 
+  " Get buffer id of the file
+  let l:buffer_id = 0
   for bufid in l:buffers
     if (bufname(bufid) ==# a:str && bufloaded(bufid) == 1)
-      let l:tabnumber = 1
-      let l:bufflist  = tabpagebuflist(l:tabnumber)
-      while (type(l:bufflist) == type([]))
-        if index(l:bufflist, bufid) > -1
-          execute "normal! " . l:tabnumber . "gt"
-          break
-        endif
-        let l:tabnumber += 1
-        let l:bufflist  = tabpagebuflist(l:tabnumber)
-      endwhile
+      let l:buffer_id = bufid
     endif
   endfor
+
+  if (l:buffer_id > 0)
+    let l:tabnumber = 1
+    let l:bufflist  = tabpagebuflist(l:tabnumber)
+    while (type(l:bufflist) == type([]))
+      if index(l:bufflist, buffer_id) > -1
+
+        " Move to the appropiate tab
+        execute "normal! " . l:tabnumber . "gt"
+
+        " Move to the appropiate window
+        let l:window_number = bufwinnr(buffer_id)
+        execute l:window_number . "wincmd w"
+
+        " Exit
+        break
+      endif
+      let l:tabnumber += 1
+      let l:bufflist  = tabpagebuflist(l:tabnumber)
+    endwhile
+  endif
 	call ctrlp#exit()
 endfunction
 
