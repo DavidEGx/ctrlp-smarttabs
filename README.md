@@ -27,6 +27,11 @@ In case you use [pathogen](https://github.com/tpope/vim-pathogen) as a plugin ma
     $ cd ~/.vim/bundle/
     $ git clone https://github.com/DavidEGx/ctrlp-smarttabs.git
 
+If you don't use any plugin manager I would strongly recommend you to have a look at [Vundle](https://github.com/gmarik/vundle.git) or [pathogen](https://github.com/tpope/vim-pathogen). If for any reason you don't want to use any plugin manager you can simple install this plugin by copying it to your ~/.vim folder:
+
+    $ wget http://www.vim.org/scripts/download_script.php?src_id=21191 -O ctrlp-smarttabs.zip
+    $ unzip ctrlp-smarttabs.zip -d ~/.vim
+    $ rm ctrlp-smarttabs.zip
 
 Basic Usage
 ===========
