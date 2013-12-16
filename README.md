@@ -22,6 +22,11 @@ to your .vimrc file and running the command:
 
     :BundleInstall
 
+In case you use [pathogen](https://github.com/tpope/vim-pathogen) as a plugin manager you can install it by running:
+
+    $ cd ~/.vim/bundle/
+    $ git clone https://github.com/DavidEGx/ctrlp-smarttabs.git
+
 
 Basic Usage
 ===========
