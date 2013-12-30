@@ -71,14 +71,19 @@ call add(g:ctrlp_ext_vars, {
 " Return: a Vim's List
 "
 function! ctrlpsmarttabs#init()
-  let l:buffers = filter(range(1,bufnr('$')), 'buflisted(v:val)')
-  let l:tablist = []
-  for bufid in l:buffers
-    let l:bufname = bufname(bufid)
-    if (strlen(l:bufname) > 0 && bufloaded(bufid) == 1)
-      call add(l:tablist, l:bufname)
-    endif
+  let l:tablist    = []
+  let l:tabnumbers = reverse(range(1,tabpagenr("$")))
+
+  for tabnumber in l:tabnumbers
+    let l:buflist = tabpagebuflist(tabnumber)
+    for bufid in l:buflist
+      let l:bufname = bufname(bufid)
+      if (strlen(l:bufname) > 0 && bufloaded(bufid) == 1 && buflisted(bufid) > 0)
+        call add(l:tablist, tabnumber . ": " . l:bufname)
+      endif
+    endfor
   endfor
+
   return l:tablist
 endfunction
 
@@ -91,36 +96,17 @@ endfunction
 "  a:str    the selected string
 "
 function! ctrlpsmarttabs#accept(mode, str)
-  let l:buffers = filter(range(1,bufnr('$')), 'buflisted(v:val)')
+  let l:tabnumber = split(a:str, ":")[0]
+  let l:bufname   = strpart(split(a:str, ":")[1], 1)
+  let l:bufname   = fnamemodify(l:bufname, ":p")
 
-  " Get buffer id of the file
-  let l:buffer_id = 0
-  for bufid in l:buffers
-    if (bufname(bufid) ==# a:str && bufloaded(bufid) == 1)
-      let l:buffer_id = bufid
-    endif
-  endfor
+  " Move to the appropriate tab
+  execute "normal! " . l:tabnumber . "gt"
 
-  if (l:buffer_id > 0)
-    let l:tabnumber = 1
-    let l:bufflist  = tabpagebuflist(l:tabnumber)
-    while (type(l:bufflist) == type([]))
-      if index(l:bufflist, buffer_id) > -1
+  " Move to the appropriate window
+  let l:window_number = bufwinnr(bufnr(l:bufname))
+  execute l:window_number . "wincmd w"
 
-        " Move to the appropiate tab
-        execute "normal! " . l:tabnumber . "gt"
-
-        " Move to the appropiate window
-        let l:window_number = bufwinnr(buffer_id)
-        execute l:window_number . "wincmd w"
-
-        " Exit
-        break
-      endif
-      let l:tabnumber += 1
-      let l:bufflist  = tabpagebuflist(l:tabnumber)
-    endwhile
-  endif
 	call ctrlp#exit()
 endfunction
 
