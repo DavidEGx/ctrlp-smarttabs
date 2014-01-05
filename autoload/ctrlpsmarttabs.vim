@@ -17,10 +17,11 @@
 
 " Load guard
 if ( exists('g:loaded_ctrlp_smarttabs') && g:loaded_ctrlp_smarttabs )
-	\ || v:version < 700 || &cp
-	finish
+  \ || v:version < 700 || &cp
+  finish
 endif
-let g:loaded_ctrlp_smarttabs = 1
+let g:loaded_ctrlp_smarttabs  = 1
+let s:ctrlp_smarttabs_tabline = ""
 
 
 " Add this extension's settings to g:ctrlp_ext_vars
@@ -53,17 +54,17 @@ let g:loaded_ctrlp_smarttabs = 1
 " + specinput: enable special inputs '..' and '@cd' (disabled by default)
 "
 call add(g:ctrlp_ext_vars, {
-	\ 'init': 'ctrlpsmarttabs#init()',
-	\ 'accept': 'ctrlpsmarttabs#accept',
-	\ 'lname': 'Smart Tabs',
-	\ 'sname': 'Tabs',
-	\ 'type': 'line',
-	\ 'enter': 'ctrlpsmarttabs#enter()',
-	\ 'exit': 'ctrlpsmarttabs#exit()',
-	\ 'opts': 'ctrlpsmarttabs#opts()',
-	\ 'sort': 0,
-	\ 'specinput': 0,
-	\ })
+ \ 'init': 'ctrlpsmarttabs#init()',
+ \ 'accept': 'ctrlpsmarttabs#accept',
+ \ 'lname': 'Smart Tabs',
+ \ 'sname': 'Tabs',
+ \ 'type': 'line',
+ \ 'enter': 'ctrlpsmarttabs#enter()',
+ \ 'exit': 'ctrlpsmarttabs#exit()',
+ \ 'opts': 'ctrlpsmarttabs#opts()',
+ \ 'sort': 0,
+ \ 'specinput': 0,
+ \ })
 
 
 " Provide a list of strings to search in
@@ -74,15 +75,26 @@ function! ctrlpsmarttabs#init()
   let l:tablist    = []
   let l:tabnumbers = reverse(range(1,tabpagenr("$")))
 
+  " Add all tabs
   for tabnumber in l:tabnumbers
     let l:buflist = tabpagebuflist(tabnumber)
     for bufid in l:buflist
       let l:bufname = bufname(bufid)
-      if (strlen(l:bufname) > 0 && bufloaded(bufid) == 1 && buflisted(bufid) > 0)
-        call add(l:tablist, tabnumber . ": " . l:bufname)
+      if (bufloaded(bufid) == 1 && buflisted(bufid) > 0)
+        if (strlen(l:bufname) > 0)
+          call add(l:tablist, tabnumber . ": " . l:bufname)
+        else
+          call add(l:tablist, tabnumber . ": [No Name]")
+        endif
       endif
     endfor
   endfor
+
+  let s:ctrlp_smarttabs_tabline = &tabline
+  augroup ctrlpsmarttabscursor
+    autocmd!
+    autocmd CursorMoved * call ctrlpsmarttabs#setTabLine()
+  augroup END
 
   return l:tablist
 endfunction
@@ -107,7 +119,7 @@ function! ctrlpsmarttabs#accept(mode, str)
   let l:window_number = bufwinnr(bufnr(l:bufname))
   execute l:window_number . "wincmd w"
 
-	call ctrlp#exit()
+  call ctrlp#exit()
 endfunction
 
 
@@ -118,6 +130,10 @@ endfunction
 
 " (optional) Do something after exiting ctrlp
 function! ctrlpsmarttabs#exit()
+  execute "set tabline=" . s:ctrlp_smarttabs_tabline
+  augroup ctrlpsmarttabscursor
+    autocmd!
+  augroup END
 endfunction
 
 
@@ -131,10 +147,58 @@ let s:id = g:ctrlp_builtins + len(g:ctrlp_ext_vars)
 
 " Allow it to be called later
 function! ctrlpsmarttabs#id()
-	return s:id
+  return s:id
 endfunction
 
+function! ctrlpsmarttabs#setTabLine()
+  let l:tabnumber = strpart(split(getline("."), ":")[0], 2)
+  if (l:tabnumber > 0)
+    execute "set tabline=%!ctrlpsmarttabs#tabLine(" . l:tabnumber . ")"
+  endif
+endfunction
 
+function! ctrlpsmarttabs#tabLine(tabnumber)
+  let s = ''
+  for i in range(tabpagenr('$'))
+    " select the highlighting
+    if i + 1 == a:tabnumber
+      let s .= '%#IncSearch#'
+    elseif i + 1 == tabpagenr()
+      let s .= '%#TabLineSel#'
+    else
+      let s .= '%#TabLine#'
+    endif
 
+    " set the tab page number (for mouse clicks)
+    let s .= '%' . (i + 1) . 'T'
+
+    " the label is made by ctrlpsmarttabs#tabLabel()
+    let s .= ' %{ctrlpsmarttabs#tabLabel(' . (i + 1) . ')} '
+  endfor
+
+  " after the last tab fill with TabLineFill and reset tab page nr
+  let s .= '%#TabLineFill#%T'
+
+  " right-align the label to close the current tab page
+  if tabpagenr('$') > 1
+    let s .= '%=%#TabLine#%999XX'
+  endif
+
+  return s
+endfunction
+
+function! ctrlpsmarttabs#tabLabel(tab)
+  let l:buflist = tabpagebuflist(a:tab)
+  let l:winnr   = tabpagewinnr(a:tab)
+  let l:name    = bufname(l:buflist[l:winnr - 1])
+  if (l:name ==# "ControlP")
+    let l:name = bufname(l:buflist[l:winnr - 2])
+  endif
+  if (l:name ==# "")
+    let l:name = "[No Name]"
+  endif
+
+  return tabpagewinnr(a:tab, '$') . " " . pathshorten(l:name)
+endfunction
 
 " vim:nofen:fdl=0:ts=2:sw=2:sts=2
