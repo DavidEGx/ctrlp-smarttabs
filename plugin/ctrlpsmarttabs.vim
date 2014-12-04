@@ -1,2 +1,2 @@
-command! CtrlPSmartTabs call ctrlp#init(ctrlpsmarttabs#id())
+command! CtrlPSmartTabs call ctrlp#init(ctrlp#smarttabs#id())
 

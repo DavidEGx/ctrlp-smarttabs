@@ -54,14 +54,14 @@ let s:ctrlp_smarttabs_tabline = ""
 " + specinput: enable special inputs '..' and '@cd' (disabled by default)
 "
 call add(g:ctrlp_ext_vars, {
- \ 'init': 'ctrlpsmarttabs#init()',
- \ 'accept': 'ctrlpsmarttabs#accept',
+ \ 'init': 'ctrlp#smarttabs#init()',
+ \ 'accept': 'ctrlp#smarttabs#accept',
  \ 'lname': 'Smart Tabs',
  \ 'sname': 'Tabs',
  \ 'type': 'line',
- \ 'enter': 'ctrlpsmarttabs#enter()',
- \ 'exit': 'ctrlpsmarttabs#exit()',
- \ 'opts': 'ctrlpsmarttabs#opts()',
+ \ 'enter': 'ctrlp#smarttabs#enter()',
+ \ 'exit': 'ctrlp#smarttabs#exit()',
+ \ 'opts': 'ctrlp#smarttabs#opts()',
  \ 'sort': 0,
  \ 'specinput': 0,
  \ })
@@ -71,7 +71,7 @@ call add(g:ctrlp_ext_vars, {
 "
 " Return: a Vim's List
 "
-function! ctrlpsmarttabs#init()
+function! ctrlp#smarttabs#init()
   let l:tablist    = []
   let l:tabnumbers = reverse(range(1,tabpagenr("$")))
 
@@ -93,7 +93,7 @@ function! ctrlpsmarttabs#init()
   let s:ctrlp_smarttabs_tabline = &tabline
   augroup ctrlpsmarttabscursor
     autocmd!
-    autocmd CursorMoved * call ctrlpsmarttabs#setTabLine()
+    autocmd CursorMoved * call ctrlp#smarttabs#setTabLine()
   augroup END
 
   return l:tablist
@@ -107,7 +107,7 @@ endfunction
 "           the values are 'e', 'v', 't' and 'h', respectively
 "  a:str    the selected string
 "
-function! ctrlpsmarttabs#accept(mode, str)
+function! ctrlp#smarttabs#accept(mode, str)
   let l:tabnumber = split(a:str, ":")[0]
   let l:bufname   = strpart(split(a:str, ":")[1], 1)
   let l:bufname   = fnamemodify(l:bufname, ":p")
@@ -124,12 +124,12 @@ endfunction
 
 
 " (optional) Do something before enterting ctrlp
-function! ctrlpsmarttabs#enter()
+function! ctrlp#smarttabs#enter()
 endfunction
 
 
 " (optional) Do something after exiting ctrlp
-function! ctrlpsmarttabs#exit()
+function! ctrlp#smarttabs#exit()
   execute "set tabline=" . s:ctrlp_smarttabs_tabline
   augroup ctrlpsmarttabscursor
     autocmd!
@@ -138,7 +138,7 @@ endfunction
 
 
 " (optional) Set or check for user options specific to this extension
-function! ctrlpsmarttabs#opts()
+function! ctrlp#smarttabs#opts()
 endfunction
 
 
@@ -146,18 +146,18 @@ endfunction
 let s:id = g:ctrlp_builtins + len(g:ctrlp_ext_vars)
 
 " Allow it to be called later
-function! ctrlpsmarttabs#id()
+function! ctrlp#smarttabs#id()
   return s:id
 endfunction
 
-function! ctrlpsmarttabs#setTabLine()
+function! ctrlp#smarttabs#setTabLine()
   let l:tabnumber = strpart(split(getline("."), ":")[0], 2)
   if (l:tabnumber > 0)
-    execute "set tabline=%!ctrlpsmarttabs#tabLine(" . l:tabnumber . ")"
+    execute "set tabline=%!ctrlp#smarttabs#tabLine(" . l:tabnumber . ")"
   endif
 endfunction
 
-function! ctrlpsmarttabs#tabLine(tabnumber)
+function! ctrlp#smarttabs#tabLine(tabnumber)
   let s = ''
   for i in range(tabpagenr('$'))
     " select the highlighting
@@ -173,7 +173,7 @@ function! ctrlpsmarttabs#tabLine(tabnumber)
     let s .= '%' . (i + 1) . 'T'
 
     " the label is made by ctrlpsmarttabs#tabLabel()
-    let s .= ' %{ctrlpsmarttabs#tabLabel(' . (i + 1) . ')} '
+    let s .= ' %{ctrlp#smarttabs#tabLabel(' . (i + 1) . ')} '
   endfor
 
   " after the last tab fill with TabLineFill and reset tab page nr
@@ -187,7 +187,7 @@ function! ctrlpsmarttabs#tabLine(tabnumber)
   return s
 endfunction
 
-function! ctrlpsmarttabs#tabLabel(tab)
+function! ctrlp#smarttabs#tabLabel(tab)
   let l:buflist = tabpagebuflist(a:tab)
   let l:winnr   = tabpagewinnr(a:tab)
   let l:name    = bufname(l:buflist[l:winnr - 1])
