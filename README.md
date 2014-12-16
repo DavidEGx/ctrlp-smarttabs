@@ -33,15 +33,30 @@ If you don't use any plugin manager I would strongly recommend you to have a loo
     $ unzip ctrlp-smarttabs.zip -d ~/.vim
     $ rm ctrlp-smarttabs.zip
 
+Configuration
+============
+Put this into your vimrc so the SmartTabs search will show up when you open CtrlP:
+
+    let g:ctrlp_extensions = ['smarttabs']
+
 Basic Usage
 ===========
 You can see the list of opened tabs using :CtrlPSmartTabs, there you can select any opened tab and press enter to jump the opened tab.
+Alternatively it is possible to open CtrlP by pressing <kbd>ctrl</kbd><kbd>p</kbd> and then reach SmartTabs pressing <kbd>ctrl</kbd><kbd>f</kbd> repeatedly.
+
 To use easily just add some mapping to your .vimrc:
 
     " Just an example from my .vimrc
     nnoremap <F3> :CtrlPSmartTabs<CR>
     nnoremap <F4> :CtrlP<CR>
 
+    " or
+    nnoremap þ :CtrlPSmartTabs<CR> " Altgr+p to open SmartTabs
+    " 'þ' is equivalent to AltGr+p in my keyboard so this allow me to have ctrl+p and altgr+p for files a tabs
+    
+    " or whatever mapping feels good
+
+
 License
 =======
-Copyright (C) 2013 David Escribano Garcia. Distributed under GPLv3 license.
+Copyright (C) 2013-2014 David Escribano Garcia. Distributed under GPLv3 license.
