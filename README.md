@@ -39,6 +39,11 @@ Put this into your vimrc so the SmartTabs search will show up when you open Ctrl
 
     let g:ctrlp_extensions = ['smarttabs']
 
+Other options:
+
+    let g:ctrlp_smarttabs_modify_tabline = 1
+    " highlight or not tab titles while searching
+
 Basic Usage
 ===========
 You can see the list of opened tabs using :CtrlPSmartTabs, there you can select any opened tab and press enter to jump the opened tab.
