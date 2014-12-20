@@ -44,6 +44,9 @@ Other options:
     let g:ctrlp_smarttabs_modify_tabline = 1
     " highlight or not tab titles while searching
 
+    let g:ctrlp_smarttabs_reverse = 1
+    " reverse the order in which the list is displayed
+
 Basic Usage
 ===========
 You can see the list of opened tabs using :CtrlPSmartTabs, there you can select any opened tab and press enter to jump the opened tab.
@@ -58,7 +61,7 @@ To use easily just add some mapping to your .vimrc:
     " or
     nnoremap þ :CtrlPSmartTabs<CR> " Altgr+p to open SmartTabs
     " 'þ' is equivalent to AltGr+p in my keyboard so this allow me to have ctrl+p and altgr+p for files a tabs
-    
+
     " or whatever mapping feels good
 
 

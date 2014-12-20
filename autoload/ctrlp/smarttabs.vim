@@ -23,6 +23,7 @@ endif
 let g:loaded_ctrlp_smarttabs  = 1
 let s:ctrlp_smarttabs_tabline = ""
 if !exists('g:ctrlp_smarttabs_modify_tabline') | let g:ctrlp_smarttabs_modify_tabline = 1 | en
+if !exists('g:ctrlp_smarttabs_reverse') | let g:ctrlp_smarttabs_reverse = 1 | en
 
 " Add this extension's settings to g:ctrlp_ext_vars
 "
@@ -73,7 +74,11 @@ call add(g:ctrlp_ext_vars, {
 "
 function! ctrlp#smarttabs#init()
   let l:tablist    = []
-  let l:tabnumbers = reverse(range(1,tabpagenr("$")))
+  if g:ctrlp_smarttabs_reverse
+    let l:tabnumbers = reverse(range(1,tabpagenr("$")))
+  else
+    let l:tabnumbers = range(1,tabpagenr("$"))
+  endif
 
   " Add all tabs
   for tabnumber in l:tabnumbers
