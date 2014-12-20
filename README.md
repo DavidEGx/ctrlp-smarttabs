@@ -3,6 +3,8 @@ CtrlP-SmartTabs
 
 Vim CtrlP plugin to switch between opened tabs.
 
+![smarttabs][1]
+
 Synopsis
 ========
 With the vim plugin CtrlP you can easily open a file or a buffer.
@@ -41,11 +43,13 @@ Put this into your vimrc so the SmartTabs search will show up when you open Ctrl
 
 Other options:
 
-    let g:ctrlp_smarttabs_modify_tabline = 1
-    " highlight or not tab titles while searching
+    let g:ctrlp_smarttabs_modify_tabline = 0
+    " If 1 will highlight the selected file in the tabline.
+    " (Default: 1)
 
-    let g:ctrlp_smarttabs_reverse = 1
-    " reverse the order in which the list is displayed
+    let g:ctrlp_smarttabs_reverse = 0
+    " Reverse the order in which files are displayed.
+    " (Default: 1)
 
 Basic Usage
 ===========
@@ -68,3 +72,5 @@ To use easily just add some mapping to your .vimrc:
 License
 =======
 Copyright (C) 2013-2014 David Escribano Garcia. Distributed under GPLv3 license.
+
+[1]: http://i.imgur.com/E1F1ove.png
