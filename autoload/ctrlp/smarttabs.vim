@@ -158,10 +158,15 @@ function! ctrlp#smarttabs#id()
 endfunction
 
 function! ctrlp#smarttabs#setTabLine()
-  let l:tabnumber = strpart(split(getline("."), ":")[0], 2)
-  if (l:tabnumber > 0)
-    execute "set tabline=%!ctrlp#smarttabs#tabLine(" . l:tabnumber . ")"
+  let l:line_parts = split(getline("."), ":")
+  if (len(l:line_parts) > 0)
+    let l:tabnumber = strpart(line_parts[0], 2)
+    if (l:tabnumber > 0)
+      execute "set tabline=%!ctrlp#smarttabs#tabLine(" . l:tabnumber . ")"
+      return
+    endif
   endif
+  execute "set tabline=%!ctrlp#smarttabs#tabLine(0)"
 endfunction
 
 function! ctrlp#smarttabs#tabLine(tabnumber)
