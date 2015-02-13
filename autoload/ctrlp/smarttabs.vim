@@ -137,7 +137,7 @@ endfunction
 
 " (optional) Do something after exiting ctrlp
 function! ctrlp#smarttabs#exit()
-  if g:ctrlp_smarttabs_modify_tabline
+  if g:ctrlp_smarttabs_modify_tabline && strlen(s:ctrlp_smarttabs_tabline) > 0
     execute "set tabline=" . s:ctrlp_smarttabs_tabline
     augroup ctrlpsmarttabscursor
       autocmd!
