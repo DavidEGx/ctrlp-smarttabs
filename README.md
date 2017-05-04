@@ -51,6 +51,10 @@ Other options:
     " Reverse the order in which files are displayed.
     " (Default: 1)
 
+    let g:ctrlp_smarttabs_exclude_quickfix = 1
+    " Exclude quickfix buffers.
+    " (Default: 0)
+
 Basic Usage
 ===========
 You can see the list of opened tabs using :CtrlPSmartTabs, there you can select any opened tab and press enter to jump the opened tab.
@@ -71,6 +75,6 @@ To use easily just add some mapping to your .vimrc:
 
 License
 =======
-Copyright (C) 2013-2014 David Escribano Garcia. Distributed under GPLv3 license.
+Copyright (C) 2013-2017 David Escribano Garcia. Distributed under GPLv3 license.
 
 [1]: http://i.imgur.com/E1F1ove.png

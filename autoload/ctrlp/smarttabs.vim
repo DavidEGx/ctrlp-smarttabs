@@ -22,8 +22,10 @@ if ( exists('g:loaded_ctrlp_smarttabs') && g:loaded_ctrlp_smarttabs )
 endif
 let g:loaded_ctrlp_smarttabs  = 1
 let s:ctrlp_smarttabs_tabline = ""
+let s:ctrlp_smarttabs_index = {}
 if !exists('g:ctrlp_smarttabs_modify_tabline') | let g:ctrlp_smarttabs_modify_tabline = 1 | en
 if !exists('g:ctrlp_smarttabs_reverse') | let g:ctrlp_smarttabs_reverse = 1 | en
+if !exists('g:ctrlp_smarttabs_exclude_quickfix') | let g:ctrlp_smarttabs_exclude_quickfix = 0 | en
 
 " Add this extension's settings to g:ctrlp_ext_vars
 "
@@ -82,16 +84,22 @@ function! ctrlp#smarttabs#init()
 
   " Add all tabs
   for tabnumber in l:tabnumbers
+    let s:ctrlp_smarttabs_index[tabnumber] = {}
     let l:buflist = tabpagebuflist(tabnumber)
     for bufid in l:buflist
-      let l:bufname = bufname(bufid)
-      if (bufloaded(bufid) == 1 && buflisted(bufid) > 0)
-        if (strlen(l:bufname) > 0)
-          call add(l:tablist, tabnumber . ": " . l:bufname)
-        else
-          call add(l:tablist, tabnumber . ": [No Name]")
-        endif
+      if (bufloaded(bufid) != 1 || buflisted(bufid) <= 0)
+        continue
       endif
+
+      let l:buftype = getbufvar(bufid, '&buftype')
+      if (l:buftype ==# 'quickfix' && g:ctrlp_smarttabs_exclude_quickfix == 1)
+        continue
+      endif
+
+      let l:title   = ctrlp#smarttabs#windowTitle(tabnumber, bufid)
+      let s:ctrlp_smarttabs_index[tabnumber][l:title] = bufid
+      call add(l:tablist, l:title)
+
     endfor
   endfor
 
@@ -114,16 +122,23 @@ endfunction
 "           the values are 'e', 'v', 't' and 'h', respectively
 "  a:str    the selected string
 "
-function! ctrlp#smarttabs#accept(mode, str)
-  let l:tabnumber = split(a:str, ":")[0]
-  let l:bufname   = strpart(split(a:str, ":")[1], 1)
-  let l:bufname   = fnamemodify(l:bufname, ":p")
+function! ctrlp#smarttabs#accept(mode, bufidx)
+  let l:tabnumber = split(a:bufidx, ":")[0]
+  try
+    " Get buffer number from index
+    let l:bufnumber = s:ctrlp_smarttabs_index[l:tabnumber][a:bufidx]
+  catch
+    " If it fails, try parsing filename
+    let l:bufname   = strpart(join(split(a:bufidx, ":")[1:], ''), 1)
+    let l:bufname   = fnamemodify(l:bufname, ":p")
+    let l:bufnumber = bufnr(l:bufname)
+  endtry
 
   " Move to the appropriate tab
   execute "normal! " . l:tabnumber . "gt"
 
   " Move to the appropriate window
-  let l:window_number = bufwinnr(bufnr(l:bufname))
+  let l:window_number = bufwinnr(l:bufnumber)
   execute l:window_number . "wincmd w"
 
   call ctrlp#exit()
@@ -213,6 +228,60 @@ function! ctrlp#smarttabs#tabLabel(tab)
   endif
 
   return tabpagewinnr(a:tab, '$') . " " . pathshorten(l:name)
+endfunction
+
+" Returns the title that will be used for a window.
+" Normally it will be something like:
+"   #tabnumber: /path/filename
+"
+" Required:
+"
+" * tabnumber
+"
+" * bufid
+"
+function! ctrlp#smarttabs#windowTitle(tabnumber, bufid)
+  let l:bufname = bufname(a:bufid)
+  let l:buftype = getbufvar(a:bufid, '&buftype')
+
+  if (strlen(l:bufname) > 0)
+    return a:tabnumber . ": " . l:bufname
+  elseif (l:buftype ==# 'quickfix')
+    return a:tabnumber . ": " . ctrlp#smarttabs#windowQuickFixTitle(a:tabnumber, a:bufid)
+  else
+    return a:tabnumber . ": [No Name]"
+  endif
+endfunction
+
+" Returns the title that will be used for a quickfix window.
+" It will be something like:
+"   #tabnumber: command run to get window [quickfix]
+"
+" Required:
+"
+" * tabnumber
+"
+" * bufid
+"
+function! ctrlp#smarttabs#windowQuickFixTitle(tabnumber, bufid)
+  let l:title = ''
+  let l:window_list = []
+
+  try
+    let l:window_list = win_findbuf(a:bufid)
+  catch
+    " Do nothing, probably win_findbuf doesn't exists in this vim version
+  endtry
+
+  for window in l:window_list
+    let l:title = gettabwinvar(a:tabnumber, window, 'quickfix_title', '')
+    if (strlen(l:title) != 0)
+      return l:title . ' [quickfix]'
+      break
+    endif
+  endfor
+
+  return '[quickfix]'
 endfunction
 
 " vim:nofen:fdl=0:ts=2:sw=2:sts=2
