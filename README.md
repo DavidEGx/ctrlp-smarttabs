@@ -18,11 +18,11 @@ Installation
 ============
 If you use [Vundle](https://github.com/gmarik/vundle.git) you can install this plugin adding this line:
 
-    Bundle 'DavidEGx/ctrlp-smarttabs'
+    Plugin 'DavidEGx/ctrlp-smarttabs'
 
 to your .vimrc file and running the command:
 
-    :BundleInstall
+    :PluginInstall
 
 In case you use [pathogen](https://github.com/tpope/vim-pathogen) as a plugin manager you can install it by running:
 
